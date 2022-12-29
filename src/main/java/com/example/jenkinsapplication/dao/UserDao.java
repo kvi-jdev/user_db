@@ -8,13 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDao {
-    private static UserDao instance = new UserDao();
-
-    private static Connection connection;
-
-    static {
-        connection = ConnectionManager.open();
-    }
+    private static final UserDao instance = new UserDao();
 
     private UserDao() {
 
@@ -27,7 +21,7 @@ public class UserDao {
     public List<User> list() {
         List<User> users = new ArrayList<>();
 
-        try {
+        try (Connection connection = ConnectionManager.open()) {
             Statement statement = connection.createStatement();
             String SQL = "SELECT * FROM users";
             ResultSet resultSet = statement.executeQuery(SQL);
@@ -50,7 +44,7 @@ public class UserDao {
 
     public User getUser(int id) {
         User user = null;
-        try {
+        try (Connection connection = ConnectionManager.open()) {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM users WHERE id=?");
 
             preparedStatement.setInt(1, id);
@@ -72,7 +66,7 @@ public class UserDao {
     }
 
     public void save(User user) {
-        try {
+        try (Connection connection = ConnectionManager.open()) {
             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users (name, surname, age) VALUES(?,?,?)");
 
             preparedStatement.setString(1, user.getName());
@@ -86,7 +80,7 @@ public class UserDao {
     }
 
     public void update(int id, User user) {
-        try {
+        try (Connection connection = ConnectionManager.open()) {
             PreparedStatement preparedStatement = connection.prepareStatement("UPDATE users SET name=?, surname=?, age=? WHERE id=?");
 
             preparedStatement.setString(1, user.getName());
@@ -101,7 +95,7 @@ public class UserDao {
     }
 
     public void delete(int id) {
-        try {
+        try (Connection connection = ConnectionManager.open()) {
             PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM users WHERE id=?");
 
             preparedStatement.setInt(1, id);
