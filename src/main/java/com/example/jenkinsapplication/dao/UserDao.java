@@ -2,7 +2,6 @@ package com.example.jenkinsapplication.dao;
 
 import com.example.jenkinsapplication.entity.User;
 import com.example.jenkinsapplication.util.ConnectionManager;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,7 @@ public class UserDao {
 
         try (Connection connection = ConnectionManager.open()) {
             Statement statement = connection.createStatement();
-            String SQL = "SELECT * FROM users";
+            String SQL = "SELECT * FROM public.users";
             ResultSet resultSet = statement.executeQuery(SQL);
 
             while (resultSet.next()) {
@@ -45,7 +44,8 @@ public class UserDao {
     public User getUser(int id) {
         User user = null;
         try (Connection connection = ConnectionManager.open()) {
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM users WHERE id=?");
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM public.users " +
+                    "WHERE id=?");
 
             preparedStatement.setInt(1, id);
 
@@ -67,7 +67,8 @@ public class UserDao {
 
     public void save(User user) {
         try (Connection connection = ConnectionManager.open()) {
-            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users (name, surname, age) VALUES(?,?,?)");
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO public.users " +
+                    "(name, surname, age) VALUES(?,?,?)");
 
             preparedStatement.setString(1, user.getName());
             preparedStatement.setString(2, user.getSurname());
@@ -81,7 +82,8 @@ public class UserDao {
 
     public void update(int id, User user) {
         try (Connection connection = ConnectionManager.open()) {
-            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE users SET name=?, surname=?, age=? WHERE id=?");
+            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE public.users SET " +
+                    "name=?, surname=?, age=? WHERE id=?");
 
             preparedStatement.setString(1, user.getName());
             preparedStatement.setString(2, user.getSurname());
@@ -96,7 +98,8 @@ public class UserDao {
 
     public void delete(int id) {
         try (Connection connection = ConnectionManager.open()) {
-            PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM users WHERE id=?");
+            PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM public.users " +
+                    "WHERE id=?");
 
             preparedStatement.setInt(1, id);
 
