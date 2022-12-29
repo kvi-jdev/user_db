@@ -1,13 +1,32 @@
 package com.example.jenkinsapplication.dao;
 
 import com.example.jenkinsapplication.entity.User;
-import com.example.jenkinsapplication.util.ConnectionManager;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserDao {
     private static final UserDao instance = new UserDao();
+    private static final String URL = "jdbc:postgresql://192.168.100.224:5432/postgres";
+    private static final String USERNAME = "postgres";
+    private static final String PASSWORD = "server31771225";
+
+    private static Connection connection;
+
+    static {
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     private UserDao() {
 
@@ -20,9 +39,9 @@ public class UserDao {
     public List<User> list() {
         List<User> users = new ArrayList<>();
 
-        try (Connection connection = ConnectionManager.open()) {
+        try {
             Statement statement = connection.createStatement();
-            String SQL = "SELECT * FROM public.users";
+            String SQL = "SELECT * FROM users";
             ResultSet resultSet = statement.executeQuery(SQL);
 
             while (resultSet.next()) {
@@ -43,9 +62,8 @@ public class UserDao {
 
     public User getUser(int id) {
         User user = null;
-        try (Connection connection = ConnectionManager.open()) {
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM public.users " +
-                    "WHERE id=?");
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM users WHERE id=?");
 
             preparedStatement.setInt(1, id);
 
@@ -66,9 +84,8 @@ public class UserDao {
     }
 
     public void save(User user) {
-        try (Connection connection = ConnectionManager.open()) {
-            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO public.users " +
-                    "(name, surname, age) VALUES(?,?,?)");
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users (name, surname, age) VALUES(?,?,?)");
 
             preparedStatement.setString(1, user.getName());
             preparedStatement.setString(2, user.getSurname());
@@ -81,9 +98,8 @@ public class UserDao {
     }
 
     public void update(int id, User user) {
-        try (Connection connection = ConnectionManager.open()) {
-            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE public.users SET " +
-                    "name=?, surname=?, age=? WHERE id=?");
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE users SET name=?, surname=?, age=? WHERE id=?");
 
             preparedStatement.setString(1, user.getName());
             preparedStatement.setString(2, user.getSurname());
@@ -97,9 +113,8 @@ public class UserDao {
     }
 
     public void delete(int id) {
-        try (Connection connection = ConnectionManager.open()) {
-            PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM public.users " +
-                    "WHERE id=?");
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM users WHERE id=?");
 
             preparedStatement.setInt(1, id);
 
@@ -107,5 +122,6 @@ public class UserDao {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
     }
 }
